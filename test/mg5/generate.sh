@@ -24,7 +24,7 @@ EOF
 elif [ -f Cards/amcatnlo_configuration.txt -a ! -f Cards/me5_configuration.txt ]; then
     echo "@@@ aMC@NLO (NLO) configuration detected."
     sed -ie 's;.*run_mode *=.*$;run_mode = 2;g' Cards/amcatnlo_configuration.txt
-    sed -ie 's;.*nb_core.*=.*$;nb_core = '$OMP_NUM_THREADS Cards/amcatnlo_configuration.txt
+    sed -ie 's;.*nb_core.*=.*$;nb_core = '$OMP_NUM_THREADS';g' Cards/amcatnlo_configuration.txt
 
     bin/generate_events -oxpMmf -n $RUNNAME
 fi
