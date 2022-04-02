@@ -2,16 +2,20 @@
 
 which conda >& /dev/null
 if [ $? -ne 0 ]; then
+    echo "enabling anaconda..."
     source /apps/applications/miniconda3/etc/profile.d/conda.sh
 fi
 
 conda activate $HOME/conda/ds4hep >& /dev/null
-if [ $? -ne 0 ]; then
-   conda create -p /scratch/$USER/conda/ds4hep -c conda-forge \
+if [ $? -eq 0 ]; then
+    echo "anaconda/ds4hep is activated."
+else
+    echo "anaconda/ds4hep is not available. Installing..."
+    conda create -p /scratch/$USER/conda/ds4hep -c conda-forge \
                 h5py numba numpy pandas scipy scikit-learn matplotlib xgboost \
                 pip ncurses tqdm yaml lz4 \
                 jupyter_client nbclient nbconvert \
                 root uproot4 
+    conda activate $HOME/conda/ds4hep >& /dev/null
 fi
-conda activate $HOME/conda/ds4hep >& /dev/null
 
