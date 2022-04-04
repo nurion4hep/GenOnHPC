@@ -50,6 +50,9 @@ echo "@@@   iseed = $SEED1"
 echo "@@@   run_mode = 2"
 sed -ie 's;.*= *nevents.*$;'$NEVTS' = nevents;g' Cards/run_card.dat
 sed -ie 's;.*= *iseed;'$SEED1' = iseed;g' Cards/run_card.dat
+if [ -f Cards/madspin_card.dat ]; then
+    sed -ie "s;set max_running_process.*;set max_running_process $OMP_NUM_THREADS;g" Cards/madspin_card.dat
+fi
 
 echo "@@@ Starting singularity session to run the mg5_amc"
 if [ -f Cards/me5_configuration.txt -a ! -f Cards/amcatnlo_configuration.txt ]; then
