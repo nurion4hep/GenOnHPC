@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 #df0 = pd.read_csv("timelog.csv")
 df0 = pd.read_csv(sys.argv[1])
-df0 = df0.rename(columns={'ncpus':'nCPUs', 'nevts':'nEvents'})
+print(df0)
+#df0 = df0.rename(columns={'ncpus':'nCPUs', 'nevts':'nEvents', 'nProc':'nCPUs', 'nEvent':'nEvents'})
 #df0 = df0[df0.nEvents <= 10000]
 nCPUsList = sorted(df0.nCPUs.unique())
 nEventsList = sorted(df0.nEvents.unique())

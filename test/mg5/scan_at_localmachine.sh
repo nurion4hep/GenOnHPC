@@ -1,25 +1,25 @@
 #!/bin/bash
+## Emulate job submission
 
-ARCHIVE=tttt_NLO4.tgz
-#export OMP_NUM_THREADS=64
+#ARCHIVE=tttt_NLO4.tgz
+export SIF=/store/sw/singularity/mg5/mg5_amc_2.9.9.sif
+export PBS_O_WORKDIR=`pwd`
+export PBS_ARRAY_INDEX=0
+export PBS_JOBID=10000
+N=3
 
-[ -f timelog.csv ] || echo "nCPUs,nEvents,real,user,sys" > timelog.csv
+#for NEVTS in 1 10 20 50 100 200 500 1000 2000 5000 10000 20000 50000 100000; do
+for NEVTS in 1 10 20 50 100 200 500 1000 2000 5000 10000; do
+    export NEVTS
+    for NCPUS in 64 48 32 24 16 12 8 4 2 1; do
+        export NCPUS
+        export OMP_NUM_THREADS=$NCPUS
 
-I=0
-#for NEVENTS in 1 10 20 50 100 200 500 1000 2000 5000 10000 20000 50000 100000; do
-for NEVENTS in 1 10 20 50 100 200 500 1000 2000 5000 10000; do
-#for NEVENTS in 20000 50000 100000; do
-  for NCPU in 64 48 32 24 16 12 8 4 2 1; do
-    export OMP_NUM_THREADS=$NCPU
-    I=$(($I+1))
-
-    tar xzf $ARCHIVE
-    cd ${ARCHIVE/.tgz/}
-    /usr/bin/time -f"${OMP_NUM_THREADS},${NEVENTS},%e,%U,%S" \
-                  -a -o ../timelog.csv \
-                  singularity exec /store/sw/singularity/mg5/mg5_amc_2.9.9.sif ../generate.sh $I $NEVENTS
-    cd ..
-    rm -rf ${ARCHIVE/.tgz/}
-
-  done
+        for PBS_ARRAY_INDEX in `seq $N`; do
+            export PBS_JOBID=$(($PBS_JOBID+1))
+            export PBS_ARRAY_INDEX
+            export PBS_JOBNAME=madgraph.TTTT_5f_NLO.nCPUs_${NCPUS}__nEvents_${NEVTS}.${PBS_JOBID}.pbs.`printf %04d ${PBS_ARRAY_INDEX}`
+            ./generate.sh
+        done
+    done
 done
