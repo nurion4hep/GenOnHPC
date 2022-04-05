@@ -7,42 +7,54 @@
 #PBS -l walltime=04:00:00
 
 ######## Parameters to be defined by user ########
-NEVTS=1000
-SIF=/scratch/hpc22a02/singularity/mg5_amc_2.9.9.sif
+IS_REUSING_ARCHIVE=0
+[ -z $NEVTS ] && NEVTS=1000
+[ -z $SIF ] && SIF=/scratch/hpc22a02/singularity/mg5_amc_2.9.9.sif
 #ARCHIVE=tttt_NLO
 ARCHIVE=`echo $PBS_JOBNAME | awk -F. '{if(NF>1){print $2}else{print $1}}'` ## madgraph.ARCHIVE_FILE_NAME.other.fields
+SEEDBASE=1000
 ##################################################
 
 ##################################################
 [ -z $PBS_ARRAY_INDEX ] && PBS_ARRAY_INDEX=0
-[ -z $NCPUS ] && export OMP_NUM_THREADS=$NCPUS
+[ -z $NCPUS ] || export OMP_NUM_THREADS=$NCPUS
 [ -z $OMP_NUM_THREADS ] && export OMP_NUM_THREADS=64 ## For the case of NCPUS and OMP_NUM_THREADS undefined
 [ -z $PBS_JOBNAME ] && PBS_JOBNAME=madgraph.TTTT0j1j_4f_LO-8CPU
-SEED1=$((1000+$PBS_ARRAY_INDEX))
+SEED1=$(($SEEDBASE+$PBS_ARRAY_INDEX))
 RUNNAME=`printf 'run_%04d' $PBS_ARRAY_INDEX`
 ##################################################
 
-cd $PBS_O_WORKDIR
-WORKDIR=${PBS_JOBNAME}.`echo $PBS_JOBID | sed -e 's;\[[0-9+]\];;g'`.`printf "%04d" $PBS_ARRAY_INDEX`
-mkdir -p $WORKDIR
-cd $WORKDIR
-
-readlink -f $WORKDIR
 env
 echo -ne "NPROC="
 nproc
 
 echo "-------------------------"
 
-module load singularity
-module load gcc/8.3.0
-module load mvapich2/2.3.6
+which module
+if [ $? -eq 0 ]; then
+    module load singularity
+    module load gcc/8.3.0
+    module load mvapich2/2.3.6
+fi
 
-echo "@@@ Extracting archive..."
-tar xzf $PBS_O_WORKDIR/${ARCHIVE}.tgz
+OUTDIR=${PBS_JOBNAME}.`echo $PBS_JOBID | sed -e 's;\[[0-9+]\];;g'`.`printf "%04d" $PBS_ARRAY_INDEX`
+OUTDIR=$PBS_O_WORKDIR/$OUTDIR
+mkdir -p $OUTDIR
+mkdir -p $OUTDIR/Events
+
+if [ $IS_REUSING_ARCHIVE -eq 1 ]; then
+    echo "@@@ Reusing existing Madgraph directory..."
+    ARCHIVE=$PBS_O_WORKDIR/$ARCHIVE
+else
+    echo "@@@ Extracting archive..."
+    cd $OUTDIR
+    tar xzf $PBS_O_WORKDIR/${ARCHIVE}.tgz
+    ARCHIVE=`readlink -f ${ARCHIVE}`
+fi
 cd $ARCHIVE
 echo "@@@ Cleaning previously produced files..."
 rm -rf RunWeb Events/*
+echo "nCPUs,nEvents,real,user,sys,maxRAM" > timelog.csv
 
 echo "@@@ Replacing run cards..."
 echo "@@@   nevents = $NEVTS"
@@ -60,8 +72,8 @@ if [ -f Cards/me5_configuration.txt -a ! -f Cards/amcatnlo_configuration.txt ]; 
     sed -ie 's;.*run_mode *=.*$;run_mode = 2;g' Cards/me5_configuration.txt
     sed -ie 's;.*nb_core.*=.*$;nb_core = '$OMP_NUM_THREADS';g' Cards/me5_configuration.txt
 
-    /usr/bin/time -p -o time.log singularity exec \
-        $SIF bin/generate_events $RUNNAME <<EOF
+    /usr/bin/time -f"${OMP_NUM_THREADS},${NEVTS},%e,%U,%S,%M" -a -o timelog.csv \
+                  singularity exec $SIF bin/generate_events $RUNNAME <<EOF
 1=OFF; 2=OFF; 3=OFF; 4=OFF; 5=OFF
 0
 EOF
@@ -71,14 +83,19 @@ elif [ -f Cards/amcatnlo_configuration.txt -a ! -f Cards/me5_configuration.txt ]
     sed -ie 's;.*run_mode *=.*$;run_mode = 2;g' Cards/amcatnlo_configuration.txt
     sed -ie 's;.*nb_core.*=.*$;nb_core = '$OMP_NUM_THREADS';g' Cards/amcatnlo_configuration.txt
 
-    /usr/bin/time -p -o time.log singularity exec \
-        $SIF bin/generate_events -oxpMmf -n $RUNNAME
+    /usr/bin/time -f"${OMP_NUM_THREADS},${NEVTS},%e,%U,%S,%M" -a -o timelog.csv \
+                  singularity exec $SIF bin/generate_events -oxpMmf -n $RUNNAME
 fi
 
 echo ARGS=$*
 echo -ne "NPROC="
 nproc
 
+mv Events/* $OUTDIR/Events/
+mv timelog.csv $OUTDIR/
+if [ $IS_REUSING_ARCHIVE -eq 0 ]; then
+    rm -rf $ARCHIVE
+fi
 
 echo "@@@ Done"
 
