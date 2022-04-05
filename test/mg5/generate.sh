@@ -7,7 +7,7 @@
 #PBS -l walltime=04:00:00
 
 ######## Parameters to be defined by user ########
-IS_REUSING_ARCHIVE=1
+IS_REUSING_ARCHIVE=0
 [ -z $NEVTS ] && NEVTS=1000
 [ -z $SIF ] && SIF=/scratch/hpc22a02/singularity/mg5_amc_2.9.9.sif
 #ARCHIVE=tttt_NLO
