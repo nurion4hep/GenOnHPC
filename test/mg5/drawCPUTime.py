@@ -17,15 +17,25 @@ def drawErrorBar(xVar, yVar, label):
     xVals = sorted(xVar.unique())
     nx = len(xVals)
     yVals = np.zeros(nx)
+    yMaxs = np.zeros(nx)
+    yMins = np.zeros(nx)
     yErrs = np.zeros(nx)
 
     for i, x in enumerate(xVals):
         ys = yVar[xVar == x]
         yVals[i] = ys.mean()
+        yMaxs[i] = ys.max()
+        yMins[i] = ys.min()
         yErrs[i] = ys.std() if not np.isnan(ys.std()) else ys.mean()
 
+    #plt.plot(xVals, yVals, label=label, marker='o', markersize=3)
     plt.errorbar(xVals, yVals, yerr=yErrs,
                  label=label, marker='o', markersize=3)
+    #plt.fill_between(xVals, yVals-yErrs, yVals+yErrs, alpha=0.4)
+    plt.fill_between(xVals, yMins, yMaxs, alpha=0.4)
+
+    #plt.xlim(0, max(1.4*max(xVals), max(plt.xlim())))
+    #plt.ylim(0, max(1.5*max(yMaxs), max(plt.ylim())))
 """
 for nEvents in nEventsList:
     df = df0[df0.nEvents == nEvents]
@@ -48,6 +58,16 @@ for nEvents in nEventsList:
     plt.tight_layout()
     plt.show()
 """
+
+plt.grid(linestyle='--', alpha=0.5, which='both')
+plt.xlabel('Number of Events')
+plt.ylabel('Maximum Memory usage (MB)')
+for nCPUs in nCPUsList:
+    df = df0[df0.nCPUs == nCPUs]
+    plt.plot(df.nEvents, df.maxRAM/1024, '.', label='nCPUs=%d' % nCPUs)
+plt.legend()
+plt.tight_layout()
+plt.show()
 
 plt.grid(linestyle='--', alpha=0.5, which='both')
 plt.xlabel('Number of Events')
