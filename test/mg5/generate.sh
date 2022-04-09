@@ -10,6 +10,7 @@
 IS_REUSING_ARCHIVE=0
 [ -z $NEVTS ] && NEVTS=1000
 [ -z $SIF ] && SIF=/scratch/hpc22a02/singularity/mg5_amc_2.9.9.sif
+[ -z $LHAPDFSETS ] && LHAPDFSETS=/scratch/hpc22a02/lhapdfsets/current
 #ARCHIVE=tttt_NLO
 ARCHIVE=`echo $PBS_JOBNAME | awk -F. '{if(NF>1){print $2}else{print $1}}'` ## madgraph.ARCHIVE_FILE_NAME.other.fields
 SEEDBASE=1000
@@ -22,6 +23,7 @@ SEEDBASE=1000
 [ -z $PBS_JOBNAME ] && PBS_JOBNAME=madgraph.TTTT0j1j_4f_LO-8CPU
 SEED1=$(($SEEDBASE+$PBS_ARRAY_INDEX))
 RUNNAME=`printf 'run_%04d' $PBS_ARRAY_INDEX`
+export LHAPDF_DATA_PATH=/lhapdfsets
 ##################################################
 
 env
@@ -73,7 +75,8 @@ if [ -f Cards/me5_configuration.txt -a ! -f Cards/amcatnlo_configuration.txt ]; 
     sed -ie 's;.*nb_core.*=.*$;nb_core = '$OMP_NUM_THREADS';g' Cards/me5_configuration.txt
 
     /usr/bin/time -f"${OMP_NUM_THREADS},${NEVTS},%e,%U,%S,%M" -a -o timelog.csv \
-                  singularity exec $SIF bin/generate_events $RUNNAME <<EOF
+                  singularity exec -B$LHAPDFSETS:/lhapdfsets \
+                  $SIF bin/generate_events $RUNNAME <<EOF
 1=OFF; 2=OFF; 3=OFF; 4=OFF; 5=OFF
 0
 EOF
@@ -84,7 +87,8 @@ elif [ -f Cards/amcatnlo_configuration.txt -a ! -f Cards/me5_configuration.txt ]
     sed -ie 's;.*nb_core.*=.*$;nb_core = '$OMP_NUM_THREADS';g' Cards/amcatnlo_configuration.txt
 
     /usr/bin/time -f"${OMP_NUM_THREADS},${NEVTS},%e,%U,%S,%M" -a -o timelog.csv \
-                  singularity exec $SIF bin/generate_events -oxpMmf -n $RUNNAME
+                  singularity exec -B$LHAPDFSETS:/lhapdfsets \
+                  $SIF bin/generate_events -oxpMmf -n $RUNNAME
 fi
 
 echo ARGS=$*
