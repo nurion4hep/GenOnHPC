@@ -17,16 +17,38 @@ From: hepstore/rivet-pythia:3.1.5-8306
     apt-get -y install subversion
 
     mkdir /sw
-    cd /sw
-    svn checkout --username anonymous --password anonymous \
-                 svn://powhegbox.mib.infn.it/trunk/POWHEG-BOX-V2
 
+    cd /sw
     git clone https://gitlab.com/openloops/OpenLoops.git
     cd OpenLoops
     ./openloops update
     ./openloops libinstall lhc.coll
 
+    cd /sw
+    svn checkout --username anonymous --password anonymous \
+                 svn://powhegbox.mib.infn.it/trunk/POWHEG-BOX-V2
+
+    ## Checkout few user proceses for a common use.
+    ## Users have to checkout POWHEG-BOX-V2 and user processes for their own
+    cd POWHEG-BOX-V2
+
+    export OLPATH=/sw/OpenLoops
+    export LHAPDF_CONFIG=lhapdf-config
+    export FFLAGS=-std=legacy ## Necessary to compile fortran codes
+
+    svn co --username anonymous --password anonymous svn://powhegbox.mib.infn.it/trunk/User-Processes-V2/hvq
+    cd hvq
+    make -j
+    cd ..
+
+    svn co --username anonymous --password anonymous svn://powhegbox.mib.infn.it/trunk/User-Processes-V2/fourtops
+    cd fourtops
+    make -j
+    cd ..
+
 %environment
     export TZ=Europe/Paris
     export LC_ALL=C
-
+    export OLPATH=/sw/OpenLoops
+    export LHAPDF_CONFIG=lhapdf-config
+    export FFLAGS=-std=legacy
