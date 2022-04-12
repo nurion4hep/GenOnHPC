@@ -1,0 +1,32 @@
+Bootstrap: docker
+From: hepstore/rivet-pythia:3.1.5-8306
+
+#%file
+#    ## svn checkout --username anonymous --password anonymous \
+#    ##              svn://powhegbox.mib.infn.it/trunk/POWHEG-BOX-V2
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+    export TZ=Europe/Paris
+    export LANG=en_US.UTF-8
+
+    apt-get -y update
+    apt-get -y install tzdata
+    apt-get -y install wget cmake gnuplot rsync ghostscript bc
+    apt-get -y install vim
+    apt-get -y install subversion
+
+    mkdir /sw
+    cd /sw
+    svn checkout --username anonymous --password anonymous \
+                 svn://powhegbox.mib.infn.it/trunk/POWHEG-BOX-V2
+
+    git clone https://gitlab.com/openloops/OpenLoops.git
+    cd OpenLoops
+    ./openloops update
+    ./openloops libinstall lhc.coll
+
+%environment
+    export TZ=Europe/Paris
+    export LC_ALL=C
+
