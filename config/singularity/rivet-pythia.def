@@ -1,0 +1,18 @@
+Bootstrap: docker
+From: hepstore/rivet-pythia:3.1.5-8306
+
+#%file
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+    export TZ=Europe/Paris
+    export LANG=en_US.UTF-8
+
+    apt-get -y update
+    apt-get -y install tzdata
+    apt-get -y install wget cmake gnuplot rsync ghostscript bc
+    apt-get -y install vim
+
+%environment
+    export TZ=Europe/Paris
+    export LC_ALL=C
