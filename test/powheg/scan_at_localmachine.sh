@@ -1,7 +1,8 @@
 #!/bin/bash
 ## Emulate job submission
 
-ARCHIVE=hvq-TT.tgz
+#ARCHIVE=hvq-TT.tgz
+ARCHIVE=fourtops-TTTT.tgz
 export SIF=/store/sw/singularity/powheg/powheg.sif
 export LHAPDFSETS=/store/sw/hep/lhapdfsets/current
 export PBS_O_WORKDIR=`pwd`
@@ -12,6 +13,7 @@ NJOBS=5
 export NCPUS=1
 export OMP_NUM_THREADS=$NCPUS
 for NEVTS in 1 10 20 50 100 200 500 1000 2000 5000 10000; do
+#for NEVTS in 10000 20000 50000 100000; do
     export NEVTS
     export PBS_JOBID=$(($PBS_JOBID+1))
 
