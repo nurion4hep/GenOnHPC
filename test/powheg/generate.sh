@@ -20,7 +20,7 @@ SEEDBASE=1000
 [ -z $PBS_ARRAY_INDEX ] && PBS_ARRAY_INDEX=0
 [ -z $NCPUS ] || export OMP_NUM_THREADS=$NCPUS
 [ -z $OMP_NUM_THREADS ] && export OMP_NUM_THREADS=64 ## For the case of NCPUS and OMP_NUM_THREADS undefined
-[ -z $PBS_JOBNAME ] && PBS_JOBNAME=powheg.TT-hvq-8CPU
+[ -z $PBS_JOBNAME ] && PBS_JOBNAME=powheg.TT-hvq
 SEED1=$(($SEEDBASE+$PBS_ARRAY_INDEX))
 RUNNAME=`printf 'run_%04d' $PBS_ARRAY_INDEX`
 export LHAPDF_DATA_PATH=/lhapdfsets
@@ -46,6 +46,7 @@ mkdir -p $OUTDIR
 
 cd $OUTDIR
 cp $PBS_O_WORKDIR/Cards/$ARCHIVE.input powheg.input
+cp $PBS_O_WORKDIR/prod/$ARCHIVE/*.dat ./
 sed -ie "s; *numevts .*;numevts $NEVTS;g" powheg.input
 sed -ie "s; *iseed .*;iseed $SEED1;g" powheg.input
 sed -ie "s; *randomseed .*;randomseed $SEED1;g" powheg.input
