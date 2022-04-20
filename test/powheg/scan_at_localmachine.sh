@@ -19,16 +19,13 @@ for NEVTS in 1 10 20 50 100 200 500 1000 2000 5000 10000; do
 
     for PBS_ARRAY_INDEX in `seq $INDEX0 $(($INDEX0+$NJOBS-1))`; do
         export PBS_ARRAY_INDEX
-        export PBS_JOBNAME=powheg.${ARCHIVE/.tgz/}.nCPUs_${NCPUS}__nEvents_${NEVTS}.${PBS_JOBID}.pbs.`printf %04d ${PBS_ARRAY_INDEX}`
-        if [ -d $PBS_JOBNAME ]; then
-            if [ ! -f $PBS_JOBNAME/timelog.csv ]; then
-                rm -rf $PBS_JOBNAME
-            elif [ `cat $PBS_JOBNAME/timelog.csv | wc -l` -ne 2 ]; then
-                rm -rf $PBS_JOBNAME
-            else
-                continue
-            fi
+        export PBS_JOBNAME=powheg.${ARCHIVE/.tgz/}.nCPUs_${NCPUS}__nEvents_${NEVTS}.${PBS_JOBID}.pbs
+        OUTDIR=${PBS_JOBNAME}.`echo $PBS_JOBID | sed -e 's;\[[0-9+]\];;g'`.`printf "%04d" $PBS_ARRAY_INDEX`
+        if [ -d $OUTDIR ]; then
+            echo "Skip" $OUTDIR
+            continue
         fi
+
         ./generate.sh &
     done
 done
