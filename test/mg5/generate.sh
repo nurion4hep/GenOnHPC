@@ -55,7 +55,7 @@ else
 fi
 cd $ARCHIVE
 echo "@@@ Cleaning previously produced files..."
-rm -rf RunWeb Events/*
+rm -rf RunWeb ME5_debug Events/*
 echo "nCPUs,nEvents,real,user,sys,maxRAM" > timelog.csv
 
 echo "@@@ Replacing run cards..."
