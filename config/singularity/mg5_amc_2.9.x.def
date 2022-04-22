@@ -1,68 +1,80 @@
+################################################################################
 # Singularity recipe to run MG5_aMC@NLO
 Bootstrap: docker
 From: rootproject/root:6.26.00-conda
+################################################################################
 
+################################################################################
 %post
-    export DEBIAN_FRONTEND=noninteractive
-    export TZ=Europe/Paris
-    export LANG=en_US.UTF-8
+################################################################################
+export DEBIAN_FRONTEND=noninteractive
+export TZ=Europe/Paris
+export LANG=en_US.UTF-8
 
-    ## Install necessary packages
-    apt-get -y update
-    apt-get -y install tzdata
-    apt-get -y install wget cmake gnuplot rsync ghostscript bc
-    apt-get -y install vim
-    export ROOTSYS=/opt/conda
+## Install necessary packages
+apt-get -y update
+apt-get -y install tzdata
+apt-get -y install wget cmake gnuplot rsync ghostscript bc
+apt-get -y install vim
+export ROOTSYS=/opt/conda
 
-    ## Install Madgraph_aMC@NLO
-    mkdir -p /sw/install
-    cd /sw/install
-    wget https://launchpad.net/mg5amcnlo/3.0/3.3.x/+download/MG5aMC_LTS_2.9.9.tar.gz
-    cd /sw
-    tar xzf /sw/install/MG5aMC_LTS_2.9.9.tar.gz
-    cd /sw/MG5_aMC_v2_9_9
+## Install Madgraph_aMC@NLO
+mkdir -p /sw/install
+cd /sw/install
+wget https://launchpad.net/mg5amcnlo/3.0/3.3.x/+download/MG5aMC_LTS_2.9.9.tar.gz
+cd /sw
+tar xzf /sw/install/MG5aMC_LTS_2.9.9.tar.gz
+cd /sw/MG5_aMC_v2_9_9
 
-    ## Install internal subpackages within the Madgraph_aMC@NLO
-    ./bin/mg5_aMC <<EOF
-    install zlib; install boost
-    install hepmc; install lhapdf6; install pythia8
+## Install internal subpackages within the Madgraph_aMC@NLO
+./bin/mg5_aMC <<EOF
+install zlib; install boost
+install hepmc; install lhapdf6; install pythia8
 
-    install ninja; install collier; install QCDLoop;
-    install looptools
+install ninja; install collier; install QCDLoop;
+install looptools
 
-    #install maddm; install MadSTR
-    #install maddump; 
-    #install ExRootAnalysis; install MadAnalysis4
+install maddm; install MadSTR
+#install maddump;
+install ExRootAnalysis; install MadAnalysis4
 EOF
 
-    ./bin/mg5_aMC << EOF
-    install Delphes
+./bin/mg5_aMC << EOF
+install Delphes
 EOF
 
-    ## First launch example process, with QCD at NLO
-    ./bin/mg5_aMC << EOF
-    generate p p > t t~ [QCD]
-    output /sw/install/out_ttNLO
+## First launch example process, with QCD at NLO
+./bin/mg5_aMC << EOF
+generate p p > t t~ [QCD]
+output /sw/install/out_ttNLO
 
-    launch -m
+launch -m
 
-    shower = PYTHIA8
-    madspin = ON
-    0
+shower = PYTHIA8
+madspin = ON
+0
 EOF
 
-    ## Allow generic users to run executables
-    chmod go+rx bin/* HEPTools/*/bin/*
-    chmod -R go+r .
+## Allow generic users to run executables
+chmod go+rx bin/* HEPTools/*/bin/*
+chmod -R go+r .
 
+################################################################################
 %environment
-    export TZ=Europe/Paris
-    export LC_ALL=C
-    export ROOTSYS=/opt/conda
-    export PATH=$PATH:/sw/MG5_aMC_v2_9_9/bin:/sw/MG5_aMC_v2_9_9/HEPTools/bin
+################################################################################
 
+export TZ=Europe/Paris
+export LC_ALL=C
+export ROOTSYS=/opt/conda
+export PATH=$PATH:/sw/MG5_aMC_v2_9_9/bin:/sw/MG5_aMC_v2_9_9/HEPTools/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/sw/MG5_aMC_v2_9_9/lib:/sw/MG5_aMC_v2_9_9/HEPTools/lib
+export PS1="\[Singularity \e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]>"
+
+################################################################################
 %runscript
-    #source /usr/local/bin/thisroot.sh
-    export PATH=$PATH:/sw/MG5_aMC_v2_9_9/bin:/sw/MG5_aMC_v2_9_9/HEPTools/bin
-    /sw/MG5_aMC_v2_9_9/bin/mg5_aMC
+################################################################################
+
+#source /usr/local/bin/thisroot.sh
+#export PATH=$PATH:/sw/MG5_aMC_v2_9_9/bin:/sw/MG5_aMC_v2_9_9/HEPTools/bin
+/sw/MG5_aMC_v2_9_9/bin/mg5_aMC
 
