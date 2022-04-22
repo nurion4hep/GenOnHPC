@@ -5,12 +5,18 @@
 LHC에서는 gridpack라는 잘 검증된 시스템이 있지만, 여기에서는 별도의 환경을 구축합니다. Gridpack은 잘 검증되어 있지만, nurion시스템에서는 그리드, cvmfs, condor cmssw등과 의존성이 있는 경우 이를 구성하기 어려울 수 있기 때문입니다.
 
 ## Building singularity images
+Singularity image를 만들기 위한 recipe파일들은 `config/singularity`디렉토리 아래에 저장되어 있습니다.
+```
+cd config/singularity
+singularity build mg5_amc_2.9.9.sif mg5_amc_2.9.recipe
+```
 
 ## Producing MC samples
 
 Example command to produce 10M events:
 ```
-export SIF=/store/sw/singularity/mg5/mg5_amc_2.9.9.sif
+cd test/mg5
+export SIF=../../config/singularity/mg5_amc_2.9.9.sif
 export LHAPDFSETS=/store/sw/hep/lhapdfsets/current
 export NCPUS=8
 export JOBSTART=1000
