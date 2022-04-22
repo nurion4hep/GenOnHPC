@@ -122,8 +122,10 @@ cd $ARBASE
 echo "@@@ Cleaning previously produced files..."
 rm -f RunWeb ME5_debug
 
-sed -ie 's;.*= *nevents.*$;'\$NEVENT' = nevents;g' $ARBASE/Cards/run_card.dat
-sed -ie 's;.*= *iseed;'\$SEED1' = iseed;g' $ARBASE/Cards/run_card.dat
+sed -ie 's;.*= *nevents.*$;'\$NEVENT' = nevents;g' Cards/run_card.dat
+sed -ie 's;.*= *iseed;'\$SEED1' = iseed;g' Cards/run_card.dat
+
+export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/sw/MG5_aMC_v2_9_9/HEPTools/lhapdf6_py3/lib
 
 echo "@@@ Starting singularity session to run the mg5_amc"
 EOF
