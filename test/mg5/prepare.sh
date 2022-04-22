@@ -3,6 +3,16 @@
 
 if [ $# -ne 1 ]; then
     echo "@@@ Usage: $0 ARCHIVE.tgz"
+    echo "    Control with envvars:"
+    echo "    export SIF=/scratch/hpc22a02/singularity/mg5_amc_2.9.9.sif"
+    echo "    export LHAPDFSETS=/scratch/hpc22a02/lhapdfsets/current"
+    echo "    export NCPUS=`nproc`"
+    echo "    export JOBSTART=1000"
+    echo "    export NEVENT=10000"
+    echo "    export NJOBS=10"
+    echo "    export JOBPREFIX=madgraph"
+    echo "    export JOBSUFFIX=SUFFIX"
+    echo "    export DORUN=0"
     exit
 fi
 ARCHIVE=$1
@@ -15,8 +25,9 @@ ARCHIVE=$1
 [ -z $JOBSTART ] && JOBSTART=1000
 [ -z $NEVENT ] && NEVENT=10000
 [ -z $NJOBS ] && NJOBS=10
-[ -z $JOBPREFIX ] && JOBPREFIX=madgraph.
+[ -z $JOBPREFIX ] && JOBPREFIX=madgraph
 [ -z $JOBSUFFIX ] && JOBSUFFIX=""
+[ -z $DORUN ] && DORUN=0
 
 ####### ENVVARS automatically re-evaluated #######
 ## OMP_NUM_THREADS: for the case of NCPUS and OMP_NUM_THREADS undefined
@@ -162,6 +173,10 @@ EOF
     chmod +x run.sh
 
     echo "nCPUs,nEvents,real,user,sys,maxRAM" > timelog.csv
+
+    if [ $DORUN -eq 1 ]; then
+        ./run.sh &
+    fi
 
     cd ..    
 done
