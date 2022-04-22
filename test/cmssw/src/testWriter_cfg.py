@@ -12,7 +12,8 @@ process.source = cms.Source("PoolSource",
 )
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.threshold = 'INFO'
+#process.MessageLogger.cerr.threshold = 'INFO'
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.writer = cms.EDAnalyzer("LHEWriter",
     fileName = cms.untracked.string("out.lhe"),
