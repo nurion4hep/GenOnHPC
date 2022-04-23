@@ -147,8 +147,14 @@ class LHEEvent:
                 if direction == False:
                     mat[js, i] = 1
         elif ctype == 'color':
-            colors1 = self.to_array('color1').astype(np.int32)
-            colors2 = self.to_array('color2').astype(np.int32)
+            colors1 = self.to_array('color1').astype(np.int32).flatten()
+            colors2 = self.to_array('color2').astype(np.int32).flatten()
+            for i, c in enumerate(colors1):
+                if c == 0: continue
+                js = np.where((colors1 == c) | (colors2 == c))
+                mat[i, js] = 1
+                mat[js, i] = 1 ## Color flow is not directional. adjacency matrix should be symmetric
+            mat -= np.diag(np.diag(mat)) ## suppress diagonal term
 
         return mat
 
@@ -187,7 +193,8 @@ if __name__ == '__main__':
     print(reader.lheEvents[0].to_array())
     print("-"*80)
     print(reader.lheEvents[0].text)
-    print(reader.lheEvents[0].adjMatrix(direction=False))
-    print(reader.lheEvents[0].adjMatrix(direction=False, ctype='color'))
-    #print(reader.lheEvents[0].edgeIndex(direction=False))
+    print('Decay adjacency matrix:\n', reader.lheEvents[0].adjMatrix(direction=False))
+    print('Decay edge index:', reader.lheEvents[0].edgeIndex(direction=False))
+    print('Color flow adjacency matrix:\n', reader.lheEvents[0].adjMatrix(direction=False, ctype='color'))
+    print('Color flow edge index:', reader.lheEvents[0].edgeIndex(direction=False, ctype='color'))
     print("^"*80)
