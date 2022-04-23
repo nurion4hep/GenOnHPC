@@ -2,7 +2,7 @@
 #import xml.etree.ElementTree as ET
 import lxml.etree as ET
 import gzip
-import math
+import numpy as np
 
 class LHEInit:
     ## HEPRUP block, Contains process information
@@ -55,19 +55,24 @@ class LHEParticle:
 
     @property
     def pt(self):
-        return math.hypot(self.px, self.py)
+        return np.hypot(self.px, self.py)
 
     @property
     def p(self):
-        return math.sqrt(self.px*self.px + self.py*self.py + self.pz*self.pz)
+        return np.sqrt(self.px*self.px + self.py*self.py + self.pz*self.pz)
 
     @property
     def eta(self):
-        return 0.5*math.atanh(self.pt/self.p)
+        if self.p == 0: return 0
+        return 0.5*np.atanh(self.pz/self.p)
 
     @property
     def phi(self):
-        return math.atan2(self.py, self.px)
+        return np.atan2(self.py, self.px)
+
+    @property
+    def rapidity(self):
+        return 0.5*(np.log(self.energy+self.pz)-np.log(self.energy-self.pz))
 
 class LHEEvent:
     def __init__(self, text):
@@ -107,6 +112,13 @@ class LHEEvent:
 
         return "\n".join(s)
 
+    def to_array(self):
+        attrs = ['pid', 'status', 'mother1', 'mother2', 'color1', 'color2', 'px', 'py', 'pz', 'energy', 'mass', 'time', 'spin']
+        data = np.zeros((self.n, len(attrs)))
+        for i in range(self.n):
+            data[i] = [getattr(self.particles[i], attr) for attr in attrs]
+        return data
+
 class LHEReader:
     def __init__(self, fileName, debug=False):
         self.fileName = fileName
@@ -139,5 +151,5 @@ if __name__ == '__main__':
     print("v"*80)
     print(reader.lheInit.text)
     print("-"*80)
-    print(reader.lheEvents[0])
+    print(reader.lheEvents[0].to_array())
     print("^"*80)
