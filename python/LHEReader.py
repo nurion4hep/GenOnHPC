@@ -127,24 +127,28 @@ class LHEEvent:
                 data[i] = [getattr(self.particles[i], attr) for attr in attrs]
         return data
 
-    def edgeIndex(self, direction=False):
+    def edgeIndex(self, direction=False, ctype='decay'):
         edgeIndex = []
-        iis, jjs = np.where(self.adjMatrix(direction) != 0)
+        iis, jjs = np.where(self.adjMatrix(direction, ctype) != 0)
         for i, j in zip(iis, jjs):
             edgeIndex.append([i, j])
         return edgeIndex
 
-    def adjMatrix(self, direction=False):
+    def adjMatrix(self, direction=False, ctype='decay'):
         mat = np.zeros((self.n, self.n), dtype=np.int32)
 
-        mothers1 = self.to_array()[:,self.particleAttrs.index('mother1')].astype(np.int32)
-        mothers2 = self.to_array()[:,self.particleAttrs.index('mother2')].astype(np.int32)
-        for i, (m1, m2) in enumerate(zip(mothers1, mothers2)):
-            if m1 == 0: continue
-            js = np.arange(m1-1, m2).astype(np.int32)
-            mat[i, js] = 1
-            if direction == False:
-                mat[js, i] = 1
+        if ctype == 'decay':
+            mothers1 = self.to_array('mother1').astype(np.int32)
+            mothers2 = self.to_array('mother2').astype(np.int32)
+            for i, (m1, m2) in enumerate(zip(mothers1, mothers2)):
+                if m1 == 0: continue
+                js = np.arange(m1-1, m2).astype(np.int32)
+                mat[i, js] = 1
+                if direction == False:
+                    mat[js, i] = 1
+        elif ctype == 'color':
+            colors1 = self.to_array('color1').astype(np.int32)
+            colors2 = self.to_array('color2').astype(np.int32)
 
         return mat
 
@@ -184,5 +188,6 @@ if __name__ == '__main__':
     print("-"*80)
     print(reader.lheEvents[0].text)
     print(reader.lheEvents[0].adjMatrix(direction=False))
-    print(reader.lheEvents[0].edgeIndex(direction=False))
+    print(reader.lheEvents[0].adjMatrix(direction=False, ctype='color'))
+    #print(reader.lheEvents[0].edgeIndex(direction=False))
     print("^"*80)
