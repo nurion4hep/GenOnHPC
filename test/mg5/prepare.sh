@@ -124,8 +124,8 @@ export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/sw/MG5_aMC_v2_9_9/HEPTools/lhapdf6_py3
 echo "@@@ Cleaning previously produced files..."
 rm -f RunWeb ME5_debug
 
-sed -ie "s;.*= *nevents.*$;'\$NEVENT' = nevents;g" Cards/run_card.dat
-sed -ie "s;.*= *iseed;'\$SEED1' = iseed;g" Cards/run_card.dat
+sed -ie "s;.*= *nevents.*$;\$NEVENT = nevents;g" Cards/run_card.dat
+sed -ie "s;.*= *iseed;\$SEED1 = iseed;g" Cards/run_card.dat
 EOF
 
     if [ -f $ARBASE/Cards/madspin_card.dat ]; then
@@ -145,8 +145,8 @@ EOF
         cat >> run.sh <<EOF
 echo "@@@ Starting singularity session to run the mg5_amc"
 
-/usr/bin/time -f"\${OMP_NUM_THREADS},\${NEVENT},%e,%U,%S,%M" -a -o ../timelog.csv \
-              singularity exec -B\$LHAPDFSETS:/lhapdfsets \
+/usr/bin/time -f"\${OMP_NUM_THREADS},\${NEVENT},%e,%U,%S,%M" -a -o ../timelog.csv \\
+              singularity exec -B\$LHAPDFSETS:/lhapdfsets \\
               \$SIF bin/generate_events \$RUNNAME <<EOF
 1=OFF; 2=OFF; 3=OFF; 4=OFF; 5=OFF
 0
@@ -162,8 +162,8 @@ EOF
         cat >> run.sh <<EOF
 echo "@@@ Starting singularity session to run the mg5_amc"
 
-/usr/bin/time -f"\${OMP_NUM_THREADS},\${NEVENT},%e,%U,%S,%M" -a -o ../timelog.csv \
-              singularity exec -B\$LHAPDFSETS:/lhapdfsets \
+/usr/bin/time -f"\${OMP_NUM_THREADS},\${NEVENT},%e,%U,%S,%M" -a -o ../timelog.csv \\
+              singularity exec -B\$LHAPDFSETS:/lhapdfsets \\
               \$SIF bin/generate_events -oxpMmf -n \$RUNNAME
 EOF
     fi
