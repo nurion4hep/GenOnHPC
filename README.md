@@ -13,7 +13,7 @@ singularity build mg5_amc_2.9.9.sif mg5_amc_2.9.recipe
 
 ## Producing MC samples
 
-Example command to produce 10M events:
+Example command to produce 1M events:
 ```
 cd test/mg5
 export SIF=../../config/singularity/mg5_amc_2.9.9.sif
@@ -22,7 +22,7 @@ export NCPUS=8
 export JOBSTART=1000
 export NEVENT=10000
 export NJOBS=100
-export JOBSUFFIX="10M"
+export JOBSUFFIX="1M"
 export DORUN=1
 ./prepare.sh TTTT_5f_NLO.tgz
 ```
