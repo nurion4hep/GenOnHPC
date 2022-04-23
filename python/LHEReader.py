@@ -64,11 +64,11 @@ class LHEParticle:
     @property
     def eta(self):
         if self.p == 0: return 0
-        return 0.5*np.atanh(self.pz/self.p)
+        return 0.5*np.arctanh(self.pz/self.p)
 
     @property
     def phi(self):
-        return np.atan2(self.py, self.px)
+        return np.arctan2(self.py, self.px)
 
     @property
     def rapidity(self):
@@ -116,29 +116,46 @@ class LHEEvent:
 
         return "\n".join(s)
 
-    def to_array(self):
-        data = np.zeros((self.n, len(self.particleAttrs)))
+    def to_array(self, attrs=None):
+        if attrs == None:
+            attrs = self.particleAttrs
+        elif type(attrs) == str:
+            attrs = [x.strip() for x in attrs.strip().split(',')]
+        data = np.zeros((self.n, len(attrs)))
         for i in range(self.n):
-            data[i] = [getattr(self.particles[i], attr) for attr in self.particleAttrs]
+            with np.errstate(divide='ignore', invalid='ignore'):
+                data[i] = [getattr(self.particles[i], attr) for attr in attrs]
         return data
 
-    def edgeIndex(self, direction=False):
+    def edgeIndex(self, direction=False, ctype='decay'):
         edgeIndex = []
-        iis, jjs = np.where(self.adjMatrix(direction) != 0)
+        iis, jjs = np.where(self.adjMatrix(direction, ctype) != 0)
         for i, j in zip(iis, jjs):
             edgeIndex.append([i, j])
         return edgeIndex
 
-    def adjMatrix(self, direction=False):
+    def adjMatrix(self, direction=False, ctype='decay'):
         mat = np.zeros((self.n, self.n), dtype=np.int32)
-        mothers1 = self.to_array()[:,self.particleAttrs.index('mother1')].astype(np.int32)
-        mothers2 = self.to_array()[:,self.particleAttrs.index('mother2')].astype(np.int32)
-        for i, (m1, m2) in enumerate(zip(mothers1, mothers2)):
-            if m1 == 0: continue
-            js = np.arange(m1-1, m2).astype(np.int32)
-            mat[i, js] = 1
-            if direction == False:
-                mat[js, i] = 1
+
+        if ctype == 'decay':
+            mothers1 = self.to_array('mother1').astype(np.int32)
+            mothers2 = self.to_array('mother2').astype(np.int32)
+            for i, (m1, m2) in enumerate(zip(mothers1, mothers2)):
+                if m1 == 0: continue
+                js = np.arange(m1-1, m2).astype(np.int32)
+                mat[i, js] = 1
+                if direction == False:
+                    mat[js, i] = 1
+        elif ctype == 'color':
+            colors1 = self.to_array('color1').astype(np.int32).flatten()
+            colors2 = self.to_array('color2').astype(np.int32).flatten()
+            for i, c in enumerate(colors1):
+                if c == 0: continue
+                js = np.where((colors1 == c) | (colors2 == c))
+                mat[i, js] = 1
+                mat[js, i] = 1 ## Color flow is not directional. adjacency matrix should be symmetric
+            mat -= np.diag(np.diag(mat)) ## suppress diagonal term
+
         return mat
 
 class LHEReader:
@@ -176,6 +193,8 @@ if __name__ == '__main__':
     print(reader.lheEvents[0].to_array())
     print("-"*80)
     print(reader.lheEvents[0].text)
-    print(reader.lheEvents[0].adjMatrix(direction=False))
-    print(reader.lheEvents[0].edgeIndex(direction=False))
+    print('Decay adjacency matrix:\n', reader.lheEvents[0].adjMatrix(direction=False))
+    print('Decay edge index:', reader.lheEvents[0].edgeIndex(direction=False))
+    print('Color flow adjacency matrix:\n', reader.lheEvents[0].adjMatrix(direction=False, ctype='color'))
+    print('Color flow edge index:', reader.lheEvents[0].edgeIndex(direction=False, ctype='color'))
     print("^"*80)
