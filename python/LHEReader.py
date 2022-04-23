@@ -64,11 +64,11 @@ class LHEParticle:
     @property
     def eta(self):
         if self.p == 0: return 0
-        return 0.5*np.atanh(self.pz/self.p)
+        return 0.5*np.arctanh(self.pz/self.p)
 
     @property
     def phi(self):
-        return np.atan2(self.py, self.px)
+        return np.arctan2(self.py, self.px)
 
     @property
     def rapidity(self):
@@ -116,10 +116,15 @@ class LHEEvent:
 
         return "\n".join(s)
 
-    def to_array(self):
-        data = np.zeros((self.n, len(self.particleAttrs)))
+    def to_array(self, attrs=None):
+        if attrs == None:
+            attrs = self.particleAttrs
+        elif type(attrs) == str:
+            attrs = [x.strip() for x in attrs.strip().split(',')]
+        data = np.zeros((self.n, len(attrs)))
         for i in range(self.n):
-            data[i] = [getattr(self.particles[i], attr) for attr in self.particleAttrs]
+            with np.errstate(divide='ignore', invalid='ignore'):
+                data[i] = [getattr(self.particles[i], attr) for attr in attrs]
         return data
 
     def edgeIndex(self, direction=False):
@@ -131,6 +136,7 @@ class LHEEvent:
 
     def adjMatrix(self, direction=False):
         mat = np.zeros((self.n, self.n), dtype=np.int32)
+
         mothers1 = self.to_array()[:,self.particleAttrs.index('mother1')].astype(np.int32)
         mothers2 = self.to_array()[:,self.particleAttrs.index('mother2')].astype(np.int32)
         for i, (m1, m2) in enumerate(zip(mothers1, mothers2)):
@@ -139,6 +145,7 @@ class LHEEvent:
             mat[i, js] = 1
             if direction == False:
                 mat[js, i] = 1
+
         return mat
 
 class LHEReader:
