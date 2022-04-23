@@ -99,6 +99,10 @@ class LHEEvent:
         for i in range(self.n+1, len(lines)):
             self.comments.append(lines[i])
 
+        ## Some attributes for convenience
+        self.particleAttrs = ['pid', 'status', 'mother1', 'mother2', 'color1', 'color2', 
+                              'px', 'py', 'pz', 'energy', 'mass', 'time', 'spin']
+
     @property
     def text(self):
         return self.__text
@@ -113,11 +117,29 @@ class LHEEvent:
         return "\n".join(s)
 
     def to_array(self):
-        attrs = ['pid', 'status', 'mother1', 'mother2', 'color1', 'color2', 'px', 'py', 'pz', 'energy', 'mass', 'time', 'spin']
-        data = np.zeros((self.n, len(attrs)))
+        data = np.zeros((self.n, len(self.particleAttrs)))
         for i in range(self.n):
-            data[i] = [getattr(self.particles[i], attr) for attr in attrs]
+            data[i] = [getattr(self.particles[i], attr) for attr in self.particleAttrs]
         return data
+
+    def edgeIndex(self, direction=False):
+        edgeIndex = []
+        iis, jjs = np.where(self.adjMatrix(direction) != 0)
+        for i, j in zip(iis, jjs):
+            edgeIndex.append([i, j])
+        return edgeIndex
+
+    def adjMatrix(self, direction=False):
+        mat = np.zeros((self.n, self.n), dtype=np.int32)
+        mothers1 = self.to_array()[:,self.particleAttrs.index('mother1')].astype(np.int32)
+        mothers2 = self.to_array()[:,self.particleAttrs.index('mother2')].astype(np.int32)
+        for i, (m1, m2) in enumerate(zip(mothers1, mothers2)):
+            if m1 == 0: continue
+            js = np.arange(m1-1, m2).astype(np.int32)
+            mat[i, js] = 1
+            if direction == False:
+                mat[js, i] = 1
+        return mat
 
 class LHEReader:
     def __init__(self, fileName, debug=False):
@@ -152,4 +174,8 @@ if __name__ == '__main__':
     print(reader.lheInit.text)
     print("-"*80)
     print(reader.lheEvents[0].to_array())
+    print("-"*80)
+    print(reader.lheEvents[0].text)
+    print(reader.lheEvents[0].adjMatrix(direction=False))
+    print(reader.lheEvents[0].edgeIndex(direction=False))
     print("^"*80)
