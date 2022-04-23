@@ -1,54 +1,59 @@
+################################################################################
 Bootstrap: docker
 From: hepstore/rivet-pythia:3.1.5-8306
+################################################################################
 
-#%file
-#    ## svn checkout --username anonymous --password anonymous \
-#    ##              svn://powhegbox.mib.infn.it/trunk/POWHEG-BOX-V2
-
+################################################################################
 %post
-    export DEBIAN_FRONTEND=noninteractive
-    export TZ=Europe/Paris
-    export LANG=en_US.UTF-8
+################################################################################
 
-    apt-get -y update
-    apt-get -y install tzdata
-    apt-get -y install wget cmake gnuplot rsync ghostscript bc
-    apt-get -y install vim
-    apt-get -y install subversion
+export DEBIAN_FRONTEND=noninteractive
+export TZ=Europe/Paris
+#export LANG=en_US.UTF-8
+export LANG=C
 
-    mkdir /sw
+apt-get -y update
+apt-get -y install tzdata
+apt-get -y install wget cmake gnuplot rsync ghostscript bc
+apt-get -y install vim
+apt-get -y install subversion
 
-    cd /sw
-    git clone https://gitlab.com/openloops/OpenLoops.git
-    cd OpenLoops
-    ./openloops update
-    ./openloops libinstall lhc.coll
+mkdir /sw
 
-    cd /sw
-    svn checkout --username anonymous --password anonymous \
-                 svn://powhegbox.mib.infn.it/trunk/POWHEG-BOX-V2
+cd /sw
+git clone https://gitlab.com/openloops/OpenLoops.git
+cd OpenLoops
+./openloops update
+./openloops libinstall lhc.coll
+export OLPATH=/sw/OpenLoops
+export LHAPDF_CONFIG=lhapdf-config
 
-    ## Checkout few user proceses for a common use.
-    ## Users have to checkout POWHEG-BOX-V2 and user processes for their own
-    cd POWHEG-BOX-V2
+cd /sw
+svn checkout --username anonymous --password anonymous \
+             svn://powhegbox.mib.infn.it/trunk/POWHEG-BOX-V2
 
-    export OLPATH=/sw/OpenLoops
-    export LHAPDF_CONFIG=lhapdf-config
-    export FFLAGS=-std=legacy ## Necessary to compile fortran codes
+## Checkout few user proceses for a common use.
+## Users have to checkout POWHEG-BOX-V2 and user processes for their own
+cd POWHEG-BOX-V2
 
-    svn co --username anonymous --password anonymous svn://powhegbox.mib.infn.it/trunk/User-Processes-V2/hvq
-    cd hvq
-    make -j
-    cd ..
+svn co --username anonymous --password anonymous svn://powhegbox.mib.infn.it/trunk/User-Processes-V2/hvq
+cd hvq
+export FFLAGS=-std=legacy ## Necessary to compile fortran codes
+make -j
+cd ..
 
-    svn co --username anonymous --password anonymous svn://powhegbox.mib.infn.it/trunk/User-Processes-V2/fourtops
-    cd fourtops
-    make -j
-    cd ..
+svn co --username anonymous --password anonymous svn://powhegbox.mib.infn.it/trunk/User-Processes-V2/fourtops
+cd fourtops
+unset FFLAGS
+make -j
+cd ..
 
+################################################################################
 %environment
-    export TZ=Europe/Paris
-    export LC_ALL=C
-    export OLPATH=/sw/OpenLoops
-    export LHAPDF_CONFIG=lhapdf-config
-    export FFLAGS=-std=legacy
+################################################################################
+
+export TZ=Europe/Paris
+export LC_ALL=C
+export OLPATH=/sw/OpenLoops
+export LHAPDF_CONFIG=lhapdf-config
+export FFLAGS=-std=legacy
