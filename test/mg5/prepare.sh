@@ -124,23 +124,23 @@ export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/sw/MG5_aMC_v2_9_9/HEPTools/lhapdf6_py3
 echo "@@@ Cleaning previously produced files..."
 rm -f RunWeb ME5_debug
 
-sed -ie 's;.*= *nevents.*$;'\$NEVENT' = nevents;g' Cards/run_card.dat
-sed -ie 's;.*= *iseed;'\$SEED1' = iseed;g' Cards/run_card.dat
+sed -ie "s;.*= *nevents.*$;'\$NEVENT' = nevents;g" Cards/run_card.dat
+sed -ie "s;.*= *iseed;'\$SEED1' = iseed;g" Cards/run_card.dat
 EOF
 
     if [ -f $ARBASE/Cards/madspin_card.dat ]; then
         echo "@@@ Madspin configuration detected."
         sed -ie "s;set *max_running_process.*;set max_running_process $OMP_NUM_THREADS;g" $ARBASE/Cards/madspin_card.dat
         cat >> run.sh <<EOF
-sed -ie 's;set *seed.*;set seed \$SEED1;g' Cards/madspin_card.dat
+sed -ie "s;set *seed.*;set seed \$SEED1;g" Cards/madspin_card.dat
 EOF
     fi
 
     if [   -f $ARBASE/Cards/me5_configuration.txt -a \
          ! -f Cards/amcatnlo_configuration.txt ]; then
         echo "@@@ Madgraph (LO) configuration detected."
-        sed -ie 's;.*run_mode *=.*$;run_mode = 2;g' $ARBASE/Cards/me5_configuration.txt
-        sed -ie 's;.*nb_core.*=.*$;nb_core = '$OMP_NUM_THREADS';g' $ARBASE/Cards/me5_configuration.txt
+        sed -ie "s;.*run_mode *=.*$;run_mode = 2;g" $ARBASE/Cards/me5_configuration.txt
+        sed -ie "s;.*nb_core.*=.*$;nb_core = $OMP_NUM_THREADS;g" $ARBASE/Cards/me5_configuration.txt
 
         cat >> run.sh <<EOF
 echo "@@@ Starting singularity session to run the mg5_amc"
@@ -156,8 +156,8 @@ EOF
     elif [   -f $ARBASE/Cards/amcatnlo_configuration.txt -a \
            ! -f $ARBASE/Cards/me5_configuration.txt ]; then
         echo "@@@ aMC@NLO (NLO) configuration detected."
-        sed -ie 's;.*run_mode *=.*$;run_mode = 2;g' $ARBASE/Cards/amcatnlo_configuration.txt
-        sed -ie 's;.*nb_core.*=.*$;nb_core = '$OMP_NUM_THREADS';g' $ARBASE/Cards/amcatnlo_configuration.txt
+        sed -ie "s;.*run_mode *=.*$;run_mode = 2;g" $ARBASE/Cards/amcatnlo_configuration.txt
+        sed -ie "s;.*nb_core.*=.*$;nb_core = $OMP_NUM_THREADS;g" $ARBASE/Cards/amcatnlo_configuration.txt
 
         cat >> run.sh <<EOF
 echo "@@@ Starting singularity session to run the mg5_amc"
