@@ -1,8 +1,8 @@
 #!/bin/bash
 ## Emulate job submission
 
-#ARCHIVE=TTTT_4f_NLO.tgz
-ARCHIVE=TTTT_5f_NLO.tgz
+#ARCHIVE=prod/TTTT_4f_NLO.tgz
+ARCHIVE=prod/TTTT_5f_NLO.tgz
 export SIF=/store/sw/singularity/mg5/mg5_amc_2.9.9.sif
 export LHAPDFSETS=/store/sw/hep/lhapdfsets/current
 export NJOBS=5
