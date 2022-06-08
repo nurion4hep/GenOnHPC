@@ -22,8 +22,8 @@ singularity build mg5_amc_2.9.9.sif mg5_amc_2.9.recipe
 ```
 
 ---
-Singularity image를 만들기 위해 사용한 docker image는 hepstore의 docker image들을 사용하였습니다.
-<https://hub.docker.com/u/hepstore>
+Singularity image를 만들기 위해 사용한 docker image는 hepstore의 docker image들을 사용하였습니다.    
+Link : <https://hub.docker.com/u/hepstore>
 
 
 ## Producing MC samples
@@ -44,7 +44,9 @@ export DORUN=1
 
 ## Wrting MC cards
 MC generator들을 활용하려면 먼저 각각 제너레이터에 필요한 Card들을 작성해야합니다. 
-
+   
+작성한 Card 파일들을 tgz형식으로 압축 후 .sh 파일과 실행하게 됩니다.    
+단. Madgraph5의 경우 card 파일을 직접 스크립트에 사용하는것이 아닌 프로그램으로 최초 실행하여 만들어진 폴더 자체를 압축하여 실행합니다.     
 
 
 
@@ -56,8 +58,12 @@ Herwig7 : <https://github.com/cms-sw/cmssw/tree/master/Configuration/Generator/p
 Sherpa : <https://github.com/cms-sw/genproductions/tree/master/bin/Sherpa>    
 
 
+
+
  
 ## MC 샘플을 validate 하기 위해서 rivet toolkit을 사용하게됩니다.
 
-
-
+```
+rivet -a analysis 'filename'.hepmc
+rivet-mkhtml Rivet.yoda
+```
