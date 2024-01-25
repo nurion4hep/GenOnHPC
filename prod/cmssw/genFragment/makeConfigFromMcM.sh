@@ -53,7 +53,8 @@ ERA=Run2_2018 ### This does nothing for the generation step
 # According to 1.0000 efficiency, validation should run 10000 / 1.0000 = 10000 events to reach the limit of 10000
 # Take the minimum of 5774 and 10000, but more than 0 -> 5774
 # It is estimated that this validation will produce: 5774 * 1.0000 = 5774 events
-NEVENT=5774
+#NEVENT=5774
+NEVENT=10
 \cp customise_*.py $CMSSW_BASE/src/Configuration/GenProduction/python
 cd $CMSSW_BASE/src/Configuration
 scram b -j
@@ -62,13 +63,15 @@ GENCONFIG=${CAMPAIGN}_cfg.py
 if [ -f $GENCONFIG ]; then
     echo "... configuration file $GENCONFIG already exists."
 else
+    #--step LHE,GEN --eventcontent RAWSIM,LHE --datatier GEN,LHE \
     cmsDriver.py $GENPRODDIR/python/$CAMPAIGN-fragment.py --no_exec --mc -n $NEVENT \
-                 --step LHE,GEN --eventcontent RAWSIM,LHE --datatier GEN,LHE \
+                 --step LHE,GEN --eventcontent GEN --datatier GEN \
                  --conditions auto:mc --geometry DB:Extended --era $ERA \
                  --python_filename ${GENCONFIG} \
                  --fileout file:${CAMPAIGN}.root \
                  --customise Configuration/DataProcessing/Utils.addMonitoring \
                  --customise Configuration/GenProduction/customise_generation.customise_nEventsInLumi \
                  --customise Configuration/GenProduction/customise_generation.customise_random \
-                 --customise Configuration/GenProduction/customise_generation.customise_messageLogger
+                 --customise Configuration/GenProduction/customise_generation.customise_messageLogger \
+                 --customise Configuration/GenProduction/customise_generation.customise_pruneGenParticles
 fi

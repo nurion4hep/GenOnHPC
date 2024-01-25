@@ -50,4 +50,14 @@ cmsRun testWriter_cfg.py
 out.lhe will be produced.
 
 ## Produce MC samples with CMSSW
+Samples can be produced with the CMSSW framework and gridpack.
+Although the aim of this repository is building a framework to generate MC samples,
+we still can rely on the standard CMSSW environment.
 
+One can generate CMSSW configuration file, taking the gen-fragment from the McM.
+```
+cd genFragment
+./makeConfigFromMcM.sh TOP-RunIISummer20UL18wmLHEGEN-00003
+cmsRun TOP-RunIISummer20UL18wmLHEGEN-00003_cfg.py
+```
+will give you .root files.
