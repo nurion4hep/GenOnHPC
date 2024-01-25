@@ -53,8 +53,8 @@ ERA=Run2_2018 ### This does nothing for the generation step
 # According to 1.0000 efficiency, validation should run 10000 / 1.0000 = 10000 events to reach the limit of 10000
 # Take the minimum of 5774 and 10000, but more than 0 -> 5774
 # It is estimated that this validation will produce: 5774 * 1.0000 = 5774 events
-#NEVENT=5774
-NEVENT=10
+NEVENT=5774
+#NEVENT=10
 \cp customise_*.py $CMSSW_BASE/src/Configuration/GenProduction/python
 cd $CMSSW_BASE/src/Configuration
 scram b -j
