@@ -65,5 +65,5 @@ else
                  --python_filename ${GENCONFIG} \
                  --fileout file:${CAMPAIGN}.root \
                  --customise Configuration/DataProcessing/Utils.addMonitoring \
-                 --customise Configuration/GenProduction/customise_nEventsInLumi
+                 --customise Configuration/GenProduction/customise_nEventsInLumi.customise_nEventsInLumi
 fi
