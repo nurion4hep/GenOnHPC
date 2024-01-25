@@ -68,6 +68,7 @@ else
                  --python_filename ${GENCONFIG} \
                  --fileout file:${CAMPAIGN}.root \
                  --customise Configuration/DataProcessing/Utils.addMonitoring \
-                 --customise Configuration/GenProduction/customise_nEventsInLumi.customise_nEventsInLumi \
-                 --customise Configuration/GenProduction/customise_random.customise_random
+                 --customise Configuration/GenProduction/customise_generation.customise_nEventsInLumi \
+                 --customise Configuration/GenProduction/customise_generation.customise_random \
+                 --customise Configuration/GenProduction/customise_generation.customise_messageLogger
 fi
