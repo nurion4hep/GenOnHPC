@@ -1,5 +1,9 @@
-# How to dump Generator level information from CMS MINIAODSIM samples
-## Installing CMSSW environment
+# Production using CMSSW
+MC generation can be done using the CMSSW.
+This is more traditional way of MC generation based on the batch or grid system,
+but let us have this alternative method.
+
+## Install CMSSW environment
 This step has to be done once to initialize your workspace
 
 If your system is shipped with the cvmfs, you can use the common singularity images
@@ -25,6 +29,7 @@ cmsenv
 git-cms-init
 ```
 
+## Dump Generator level information from CMS MINIAODSIM samples
 Then, set up Generator related packages.
 The GeneratorInterface/LHEInterface package contains various helper modules.
 Among them, we will use LHEWriter module to dump the LHE event content
