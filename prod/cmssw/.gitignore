@@ -1,1 +1,6 @@
 CMSSW_*
+*.lhe
+*.log
+*.err
+*.out
+*.root
