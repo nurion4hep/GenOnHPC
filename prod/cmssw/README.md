@@ -40,8 +40,8 @@ a minor fix to the LHEWriter.cc source code and configuration file.
 The .cc and cfg.py files are available in this repository.
 ```
 git-cms-addpkg GeneratorInterface/LHEInterface
-cp ../../src/LHEWriter.cc GeneratorInterface/LHEInterface/plugins/LHEWriter.cc
-cp ../../src/testWriter_cfg.py GeneratorInterface/LHEInterface/test/testWriter_cfg.py
+cp ../../lheWriter/LHEWriter.cc GeneratorInterface/LHEInterface/plugins/LHEWriter.cc
+cp ../../lheWriter/testWriter_cfg.py GeneratorInterface/LHEInterface/test/testWriter_cfg.py
 scram b -j
 
 cd GeneratorInterface/LHEInterface/test
