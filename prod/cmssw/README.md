@@ -30,7 +30,6 @@ git-cms-init
 ```
 
 ## Dump Generator level information from CMS MINIAODSIM samples
-Then, set up Generator related packages.
 The GeneratorInterface/LHEInterface package contains various helper modules.
 Among them, we will use LHEWriter module to dump the LHE event content
 and header from the MINIAODSIM input file.
@@ -49,4 +48,6 @@ cmsRun testWriter_cfg.py
 ```
 
 out.lhe will be produced.
+
+## Produce MC samples with CMSSW
 
