@@ -54,7 +54,10 @@ ERA=Run2_2018 ### This does nothing for the generation step
 # Take the minimum of 5774 and 10000, but more than 0 -> 5774
 # It is estimated that this validation will produce: 5774 * 1.0000 = 5774 events
 NEVENT=5774
-cp customise_nEventsInLumi.py $CMSSW_BASE/src/Configuration/GenProduction/python
+\cp customise_*.py $CMSSW_BASE/src/Configuration/GenProduction/python
+cd $CMSSW_BASE/src/Configuration
+scram b -j
+cd -
 GENCONFIG=${CAMPAIGN}_cfg.py
 if [ -f $GENCONFIG ]; then
     echo "... configuration file $GENCONFIG already exists."
@@ -65,5 +68,6 @@ else
                  --python_filename ${GENCONFIG} \
                  --fileout file:${CAMPAIGN}.root \
                  --customise Configuration/DataProcessing/Utils.addMonitoring \
-                 --customise Configuration/GenProduction/customise_nEventsInLumi.customise_nEventsInLumi
+                 --customise Configuration/GenProduction/customise_nEventsInLumi.customise_nEventsInLumi \
+                 --customise Configuration/GenProduction/customise_random.customise_random
 fi
