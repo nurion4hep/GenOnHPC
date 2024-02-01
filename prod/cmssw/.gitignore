@@ -4,3 +4,5 @@ CMSSW_*
 *.err
 *.out
 *.root
+genFragment/*_cfg.py
+genFragment/*.xml
