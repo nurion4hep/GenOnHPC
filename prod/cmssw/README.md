@@ -88,5 +88,7 @@ cd ..
 Run the Delphes to do the detector simulation.
 
 ```
+ROOT_INCLUDE_PATH=$ROOT_INCLUDE_PATH:Delphes-3.5.0/external
+
 ./Delphes-3.5.0/DelphesCMSFWLite Delphes-3.5.0/cards/delphes\_card\_CMS.tcl out.root genFragment/TOP-RunIISummer20UL18wmLHEGEN-00003.root
 ```
