@@ -9,7 +9,7 @@ This step has to be done once to initialize your workspace
 If your system is shipped with the cvmfs, you can use the common singularity images
 to set up your base CMSSW.
 ```
-source /cvmfs/cms.cern.ch/cmsset_default.sh 
+source /cvmfs/cms.cern.ch/cmsset\_default.sh
 cmssw-cc7
 ```
 
@@ -17,14 +17,14 @@ After entering the CMSSW's singularity environment, run the following steps
 to initialize your workspace.
 
 ```
-CMSSW_VERSION=CMSSW_12_2_0
-if [ -d $CMSSW_VERSION ]; then
-  echo "CMSSW already installed: $CMSSW_VERSION"
+CMSSW\_VERSION=CMSSW\_12\_2\_0
+if [ -d $CMSSW\_VERSION ]; then
+  echo "CMSSW already installed: $CMSSW\_VERSION"
   exit
 fi
 
-cmsrel $CMSSW_VERSION
-cd $CMSSW_VERSION/src
+cmsrel $CMSSW\_VERSION
+cd $CMSSW\_VERSION/src
 cmsenv
 git-cms-init
 ```
@@ -40,11 +40,11 @@ The .cc and cfg.py files are available in this repository.
 ```
 git-cms-addpkg GeneratorInterface/LHEInterface
 cp ../../lheWriter/LHEWriter.cc GeneratorInterface/LHEInterface/plugins/LHEWriter.cc
-cp ../../lheWriter/testWriter_cfg.py GeneratorInterface/LHEInterface/test/testWriter_cfg.py
+cp ../../lheWriter/testWriter\_cfg.py GeneratorInterface/LHEInterface/test/testWriter\_cfg.py
 scram b -j
 
 cd GeneratorInterface/LHEInterface/test
-cmsRun testWriter_cfg.py
+cmsRun testWriter\_cfg.py
 ```
 
 out.lhe will be produced.
@@ -58,6 +58,35 @@ One can generate CMSSW configuration file, taking the gen-fragment from the McM.
 ```
 cd genFragment
 ./makeConfigFromMcM.sh TOP-RunIISummer20UL18wmLHEGEN-00003
-cmsRun TOP-RunIISummer20UL18wmLHEGEN-00003_cfg.py
+cmsRun TOP-RunIISummer20UL18wmLHEGEN-00003\_cfg.py
 ```
 will give you .root files.
+
+Please note that this configuration file saves minimal set of event contents
+which can be used in generator level studies based on the Delphes and drop the
+original GenParticle and HepMC contents.
+If you need the full GenParticles and HepMC, please modify the \_cfg.py file
+not to apply customization step for pruning.
+
+## Runing Delphes Fast simulation
+Detector simulation can be done with the Delphes Fast-simulation software.
+Delphes suports CMSSW's GenParticles dataformat, including the prunedGenParticles
+and packedGenParticles in the MiniAOD datatier.
+
+Install the Delphes software as follows;
+```
+wget http://cp3.irmp.ucl.ac.be/downloads/Delphes-3.5.0.tar.gz
+tar xzf Delphes-3.5.0.tar.gz
+
+cd Delphes-3.5.0
+sed -i 's/c++0x/c++17/g' Makefile
+make -j
+
+cd ..
+```
+
+Run the Delphes to do the detector simulation.
+
+```
+./Delphes-3.5.0/DelphesCMSFWLite Delphes-3.5.0/cards/delphes\_card\_CMS.tcl out.root genFragment/TOP-RunIISummer20UL18wmLHEGEN-00003.root
+```
