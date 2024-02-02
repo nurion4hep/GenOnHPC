@@ -5,5 +5,5 @@ Delphes-*
 *.err
 *.out
 *.root
-genFragment/*.xml
 genFragment/*_cfg.py
+genFragment/*.xml
