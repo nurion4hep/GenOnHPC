@@ -1,0 +1,9 @@
+CMSSW_*
+Delphes-*
+*.lhe
+*.log
+*.err
+*.out
+*.root
+genFragment/*_cfg.py
+genFragment/*.xml
